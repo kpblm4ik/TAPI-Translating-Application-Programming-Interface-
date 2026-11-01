@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TAPI dictionary v1",
+  "type": "object",
+  "required": ["version", "dictionary"],
+  "properties": {
+    "version": { "type": "integer", "const": 1 },
+    "updated": { "type": "string", "format": "date" },
+    "dictionary": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["literary_ru", "translation_en"],
+        "properties": {
+          "literary_ru": { "type": "string", "minLength": 1 },
+          "translation_en": { "type": "string", "minLength": 1 },
+          "category": { "type": "string", "enum": ["gaming", "slang", "it", "general"] },
+          "aliases": { "type": "array", "items": { "type": "string" } },
+          "example": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}
