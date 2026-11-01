@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "updated": "2026-11-01",
+  "dictionary": {
+    "имба": { "literary_ru": "чрезмерно сильный, нечестно выигрышный (о персонаже, предмете, умении)", "translation_en": "overpowered (OP)", "category": "gaming", "aliases": ["имбовый", "имбовая", "имбовое"], "example": "Эта катушка просто имба" },
+    "нерф": { "literary_ru": "ослабление чего-либо в игре обновлением", "translation_en": "nerf (an update that weakens something)", "category": "gaming", "aliases": ["нерфить", "нерфнули", "нерфанули"], "example": "Палочку нерфнули в последнем патче" },
+    "бафф": { "literary_ru": "усиление чего-либо в игре", "translation_en": "buff", "category": "gaming", "aliases": ["баффнуть", "баффнули"], "example": "После баффа скорость выросла" },
+    "фармить": { "literary_ru": "многократно проходить один участок ради ресурсов или опыта", "translation_en": "to farm", "category": "gaming", "aliases": ["фарм", "фармлю", "фармим", "фармил", "фармят"], "example": "Весь вечер фармил монеты" },
+    "гриндить": { "literary_ru": "долго и однообразно повторять действия ради прогресса", "translation_en": "to grind", "category": "gaming", "aliases": ["гринд", "гриндил", "гриндим"], "example": "Пришлось гриндить ради редкой палочки" },
+    "лутать": { "literary_ru": "подбирать добычу и предметы", "translation_en": "to loot", "category": "gaming", "aliases": ["лут", "лутаю", "залутал"], "example": "Залутал сундук" },
+    "спавн": { "literary_ru": "появление персонажа или предмета в игре", "translation_en": "spawn", "category": "gaming", "aliases": ["спавниться", "заспавнился"], "example": "Предмет появляется на спавне" },
+    "респавн": { "literary_ru": "возрождение персонажа после поражения", "translation_en": "respawn", "category": "gaming", "aliases": ["респавниться", "респ"], "example": "Жду респавна" },
+    "лагать": { "literary_ru": "работать с задержкой из-за плохого соединения или слабого устройства", "translation_en": "to lag", "category": "gaming", "aliases": ["лаг", "лаги", "лагает"], "example": "Игра лагает на телефоне" },
+    "нуб": { "literary_ru": "новичок, неопытный игрок", "translation_en": "noob (newbie)", "category": "gaming", "aliases": ["нубы", "нубас"], "example": "Не ругай нуба" },
+    "гг": { "literary_ru": "хорошая игра (вежливо после матча)", "translation_en": "gg (good game)", "category": "gaming", "aliases": [], "example": "Всем гг" },
+    "ливнуть": { "literary_ru": "покинуть игру, сервер или чат", "translation_en": "to leave (quit)", "category": "gaming", "aliases": ["лив", "ливнул", "ливнула"], "example": "Он ливнул посреди матча" },
+    "билд": { "literary_ru": "набор характеристик и предметов персонажа", "translation_en": "build", "category": "gaming", "aliases": ["билды"], "example": "Собрал билд на скорость" },
+    "ачивка": { "literary_ru": "достижение, награда за выполнение задания", "translation_en": "achievement", "category": "gaming", "aliases": ["ачивки"], "example": "Получил ачивку за 100 прыжков" },
+    "скин": { "literary_ru": "внешний вид персонажа или предмета", "translation_en": "skin", "category": "gaming", "aliases": ["скины"], "example": "Купил новый скин" },
+    "донат": { "literary_ru": "платная покупка в игре или пожертвование автору", "translation_en": "in-game purchase / donation", "category": "gaming", "aliases": ["донатить", "задонатил"], "example": "Эта вещь только за донат" },
+    "рандом": { "literary_ru": "случайность, случайный выбор", "translation_en": "random", "category": "general", "aliases": ["рандомный", "рандомно"], "example": "Предмет выпал рандомно" },
+    "кринж": { "literary_ru": "чувство неловкости и стыда за чужие действия; нечто неловкое", "translation_en": "cringe", "category": "slang", "aliases": ["кринжовый", "кринжово"], "example": "Это полный кринж" },
+    "рофл": { "literary_ru": "шутка, нечто смешное; смеяться", "translation_en": "lol / joke", "category": "slang", "aliases": ["рофлить", "рофлю"], "example": "Это был просто рофл" },
+    "краш": { "literary_ru": "объект симпатии, тот, кто нравится", "translation_en": "crush", "category": "slang", "aliases": ["крашу"], "example": "Он мой краш" },
+    "хайп": { "literary_ru": "шумиха, ажиотаж вокруг чего-либо", "translation_en": "hype", "category": "slang", "aliases": ["хайпить", "хайповый"], "example": "Вокруг игры много хайпа" },
+    "вайб": { "literary_ru": "атмосфера, настроение места или человека", "translation_en": "vibe", "category": "slang", "aliases": ["вайбы", "вайбовый"], "example": "Тут хороший вайб" },
+    "токсик": { "literary_ru": "агрессивный, неприятный в общении человек", "translation_en": "toxic person", "category": "slang", "aliases": ["токсичный", "токсичить", "токсики"], "example": "В чате полно токсиков" },
+    "чилить": { "literary_ru": "отдыхать, расслабляться", "translation_en": "to chill", "category": "slang", "aliases": ["чил", "чилл", "чилю"], "example": "Просто чилю дома" },
+    "ауф": { "literary_ru": "выражение восхищения или одобрения", "translation_en": "awesome / wow", "category": "slang", "aliases": [], "example": "Ауф, вот это прыжок" },
+    "зашквар": { "literary_ru": "постыдный, позорный поступок", "translation_en": "disgrace (shameful thing)", "category": "slang", "aliases": ["зашкварный"], "example": "Это зашквар" }
+  }
+}
