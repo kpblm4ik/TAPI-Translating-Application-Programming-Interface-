@@ -7,6 +7,7 @@
  *    data-lang    literary_ru (по умолчанию) или translation_en
  *    data-mode    hover (подсказка, по умолчанию) | replace (заменить слово) | off (только API)
  *    data-scope   CSS-селектор области страницы (по умолчанию body)
+ *    data-lookup  wiktionary — переводить выделенное слово через Викисловарь (по умолчанию off)
  *  Закрыть кусок страницы от перевода: class="tapi-skip" или translate="no".
  */
 (function () {
@@ -25,6 +26,7 @@
     lang: ds.lang || 'literary_ru',
     mode: ds.mode || 'hover',
     scope: ds.scope || 'body',
+    lookup: ds.lookup || 'off',
     ttl: 24 * 60 * 60 * 1000
   };
 
@@ -138,6 +140,16 @@
     s.textContent = label + value;
     parent.appendChild(s);
   }
+  function placeTip(r) {
+    var t = ensureTip();
+    t.style.display = 'block';
+    var tw = t.offsetWidth, th = t.offsetHeight;
+    var x = Math.min(Math.max(8, r.left), window.innerWidth - tw - 8);
+    var y = r.bottom + 8;
+    if (y + th > window.innerHeight - 8) y = Math.max(8, r.top - th - 8);
+    t.style.left = x + 'px';
+    t.style.top = y + 'px';
+  }
   function showTip(el) {
     var entry = index[norm(el.getAttribute('data-tapi'))];
     if (!entry) return;
@@ -158,13 +170,8 @@
       ex.textContent = '«' + entry.example + '»';
       t.appendChild(ex);
     }
-    t.style.display = 'block';
-    var r = el.getBoundingClientRect(), tw = t.offsetWidth, th = t.offsetHeight;
-    var x = Math.min(Math.max(8, r.left), window.innerWidth - tw - 8);
-    var y = r.bottom + 8;
-    if (y + th > window.innerHeight - 8) y = Math.max(8, r.top - th - 8);
-    t.style.left = x + 'px';
-    t.style.top = y + 'px';
+    t.style.pointerEvents = 'none';
+    placeTip(el.getBoundingClientRect());
     tipFor = el;
   }
   function hideTip() { if (tip) tip.style.display = 'none'; tipFor = null; }
@@ -181,6 +188,137 @@
     });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hideTip(); });
     window.addEventListener('scroll', hideTip, { passive: true });
+  }
+
+  // ---------- Викисловарь: перевод любого выделенного слова ----------
+  var WIKT = 'https://en.wiktionary.org/api/rest_v1/page/definition/';
+  var WIKT_TTL = 7 * 24 * 60 * 60 * 1000;
+  var FORM_OF = /\b(form|plural|singular|genitive|dative|accusative|instrumental|prepositional|nominative|participle|inflection|past|present)\b.*\bof\b/i;
+  var memo = Object.create(null);
+
+  function htmlToText(html) {
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    return (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+  function firstLinkTitle(html) {
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    var a = doc.querySelector('a[href]');
+    if (!a) return null;
+    var h = a.getAttribute('href').replace(/^(\.\/|\/wiki\/)/, '').replace(/#.*$/, '');
+    try { h = decodeURIComponent(h); } catch (e) {}
+    return h && h.indexOf(':') === -1 ? h : null;
+  }
+  function wiktCache(key, value) {
+    try {
+      if (value === undefined) {
+        var c = JSON.parse(localStorage.getItem('tapi:w:' + key) || 'null');
+        return c && Date.now() - c.t < WIKT_TTL ? c.d : null;
+      }
+      localStorage.setItem('tapi:w:' + key, JSON.stringify({ t: Date.now(), d: value }));
+    } catch (e) {}
+    return null;
+  }
+  function wiktLookup(term, depth) {
+    var t = norm(term);
+    if (memo[t]) return memo[t];
+    var cached = wiktCache(t);
+    if (cached) return (memo[t] = Promise.resolve(cached));
+    var lang = /[\u0400-\u04FF]/.test(t) ? 'ru' : 'en';
+    memo[t] = fetch(WIKT + encodeURIComponent(t), { credentials: 'omit' })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (data) {
+        var senses = [], lemma = null;
+        (data[lang] || []).forEach(function (g) {
+          (g.definitions || []).forEach(function (d) {
+            var text = d.definition ? htmlToText(d.definition) : '';
+            if (!text) return;
+            if (!lemma && FORM_OF.test(text)) lemma = firstLinkTitle(d.definition);
+            senses.push({ pos: g.partOfSpeech || '', text: text });
+          });
+        });
+        if (!senses.length) throw new Error('not found');
+        if (lemma && lemma !== t && (depth || 0) < 1) {
+          return wiktLookup(lemma, 1).then(function (res) {
+            return Object.assign({}, res, { from: t });
+          }, function () { return null; }).then(function (res) { return res || finish(); });
+        }
+        return finish();
+        function finish() {
+          return { source: 'wiktionary', term: t, senses: senses.slice(0, 4),
+                   url: 'https://en.wiktionary.org/wiki/' + encodeURIComponent(t) };
+        }
+      })
+      .then(function (res) { wiktCache(t, res); return res; });
+    memo[t].catch(function () { delete memo[t]; });
+    return memo[t];
+  }
+  // Сначала словарь TAPI (точные сленговые значения), затем Викисловарь
+  function define(word) {
+    var e = lookup(word);
+    if (e) return Promise.resolve({ source: 'tapi', term: e.key, entry: e });
+    return wiktLookup(word, 0);
+  }
+
+  function showResult(rect, res) {
+    var t = ensureTip();
+    t.textContent = '';
+    var h = document.createElement('b');
+    h.textContent = res.from ? res.from + ' → ' + res.term : (res.entry ? res.entry.key : res.term);
+    t.appendChild(h);
+    if (res.source === 'tapi') {
+      line(t, 'По-русски: ', res.entry.literary_ru);
+      line(t, 'EN: ', res.entry.translation_en);
+    } else {
+      res.senses.forEach(function (s, i) {
+        var text = (i + 1) + '. ' + (s.pos ? '(' + s.pos.toLowerCase() + ') ' : '') + s.text;
+        line(t, '', text.length > 170 ? text.slice(0, 167) + '…' : text);
+      });
+      var src = document.createElement('small');
+      src.appendChild(document.createTextNode('Источник: '));
+      var a = document.createElement('a');
+      a.href = res.url; a.target = '_blank'; a.rel = 'noopener';
+      a.textContent = 'Викисловарь';
+      a.style.color = '#bcaada';
+      src.appendChild(a);
+      src.appendChild(document.createTextNode(' (CC BY-SA 4.0)'));
+      t.appendChild(src);
+    }
+    t.style.pointerEvents = 'auto';
+    placeTip(rect);
+  }
+  function showMessage(rect, text) {
+    var t = ensureTip();
+    t.textContent = '';
+    line(t, '', text);
+    t.style.pointerEvents = 'none';
+    placeTip(rect);
+  }
+
+  function onSelect() {
+    var sel = window.getSelection && window.getSelection();
+    if (!sel || sel.isCollapsed || !sel.rangeCount) return;
+    var text = sel.toString().trim();
+    if (!text || text.length > 40 || !/^[\p{L}'’-]+$/u.test(text)) return;
+    var an = sel.anchorNode && (sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentNode);
+    if (an && an.closest && an.closest('input,textarea,[contenteditable="true"],[translate="no"],.tapi-skip,.tapi-tip,.tapi-word')) return;
+    var rect = sel.getRangeAt(0).getBoundingClientRect();
+    showMessage(rect, 'Ищу «' + text + '»…');
+    define(text).then(function (res) {
+      var cur = window.getSelection();
+      if (cur && cur.toString().trim() === text) showResult(rect, res);
+    }, function () {
+      showMessage(rect, 'Слово «' + text + '» не найдено в словарях.');
+    });
+  }
+  function bindLookup() {
+    var timer;
+    document.addEventListener('selectionchange', function () {
+      clearTimeout(timer);
+      timer = setTimeout(onSelect, 450);
+    });
+    document.addEventListener('mousedown', function (e) {
+      if (!(e.target.closest && e.target.closest('.tapi-tip'))) hideTip();
+    });
   }
 
   // ---------- Обход страницы ----------
@@ -273,6 +411,8 @@
       return e ? (e[lang || cfg.lang] || null) : null;
     },
     lookup: lookup,
+    // TAPI.define('слово') -> Promise: сначала TAPI, затем Викисловарь
+    define: define,
     refresh: function (root) { process(root || document.querySelector(cfg.scope)); },
     setLanguage: function (lang) { cfg.lang = lang; },
     _core: { norm: norm, buildIndex: buildIndex, lookup: lookup, findMatches: findMatches }
@@ -289,6 +429,7 @@
         process(root);
         observe(root);
       }
+      if (cfg.lookup === 'wiktionary') bindLookup();
       document.dispatchEvent(new CustomEvent('tapi:ready', { detail: { words: Object.keys(data.dictionary).length } }));
       return api;
     }).catch(function (err) {
