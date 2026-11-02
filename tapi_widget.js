@@ -5,9 +5,11 @@
  * Сам подгружает tapi.js с выбранным языком (ru → literary_ru, en → translation_en).
  *
  * Необязательные атрибуты тега <script>:
- *   data-scope   — CSS-селектор области страницы (по умолчанию body)
- *   data-lookup  — wiktionary | off (по умолчанию wiktionary: любое выделенное слово)
- *   data-mode    — hover | replace | off (по умолчанию hover)
+ *   data-scope    — CSS-селектор области страницы (по умолчанию body)
+ *   data-lookup   — wiktionary | off (по умолчанию wiktionary: любое выделенное слово)
+ *   data-mode     — hover | replace | off (по умолчанию hover)
+ *   data-phrases  — адрес таблицы фраз (JSON) для перевода страницы целиком на English
+ *                   (см. tapi-pages.js). Без него English показывает только подсказки.
  */
 (function () {
   'use strict';
@@ -32,7 +34,7 @@
   var current = store();
   if (!LANGS[current]) current = null;
 
-  /* ---------- загрузка самого словаря ---------- */
+  /* ---------- загрузка словаря (tapi.js) ---------- */
   function loadTapi(code) {
     var s = document.createElement('script');
     s.src = base + 'tapi.js';
@@ -46,7 +48,26 @@
     });
     document.head.appendChild(s);
   }
-  if (current) loadTapi(current);
+
+  /* ---------- запуск: сначала перевод страницы (English), потом словарь ---------- */
+  function start(code) {
+    var phrases = me.getAttribute('data-phrases');
+    if (code === 'en' && phrases) {
+      var p = document.createElement('script');
+      p.src = base + 'tapi-pages.js';
+      p.onload = function () {
+        var done = function () { loadTapi(code); };
+        try {
+          window.TAPIPages.run({ url: phrases, scope: me.getAttribute('data-scope') || 'body' }).then(done, done);
+        } catch (e) { done(); }
+      };
+      p.onerror = function () { loadTapi(code); };
+      document.head.appendChild(p);
+    } else {
+      loadTapi(code);
+    }
+  }
+  if (current) start(current);
 
   /* ---------- стили ---------- */
   var css =
@@ -142,7 +163,7 @@
   function choose(code) {
     if (code === current) { return; }
     store(code);
-    location.reload();      // самый надёжный способ: словарь заново читает data-lang
+    location.reload();      // самый надёжный способ: страница и словарь заново читают выбранный язык
   }
 
   if (document.body) build();
