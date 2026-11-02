@@ -6,7 +6,6 @@
  *
  * Необязательные атрибуты тега <script>:
  *   data-scope    — CSS-селектор области страницы (по умолчанию body)
- *   data-lookup   — wiktionary | off (по умолчанию wiktionary: любое выделенное слово)
  *   data-mode     — hover | replace | off (по умолчанию hover)
  *   data-phrases  — адрес таблицы фраз (JSON) для перевода страницы целиком на English
  *                   (см. tapi-pages.js). Без него English показывает только подсказки.
@@ -40,9 +39,7 @@
     s.src = base + 'tapi.js';
     s.defer = true;
     s.setAttribute('data-lang', LANGS[code].tapi);
-    // по умолчанию любое выделенное слово ищется в Викисловаре (data-lookup="off" выключает)
-    s.setAttribute('data-lookup', 'wiktionary');
-    ['scope', 'lookup', 'mode', 'src'].forEach(function (a) {
+    ['scope', 'mode', 'src'].forEach(function (a) {
       var v = me.getAttribute('data-' + a);
       if (v) s.setAttribute('data-' + a, v);
     });
@@ -88,7 +85,8 @@
     '.tapi-w-opt:hover,.tapi-w-opt:focus-visible{background:var(--hv);outline:none}' +
     '.tapi-w-opt[aria-checked="true"]{border-color:var(--ac);box-shadow:inset 0 0 0 1px var(--ac)}' +
     '.tapi-w-code{font-size:12px;opacity:.65}' +
-    '.tapi-w-hint{margin:8px 0 0;font-size:12px;opacity:.7}';
+    '.tapi-w-hint{margin:8px 0 0;font-size:12px;opacity:.7}' +
+    '@media (prefers-reduced-motion:reduce){.tapi-w-btn.tapi-w-new{animation:none}}';
   var st = document.createElement('style');
   st.textContent = css;
   document.head.appendChild(st);
@@ -141,7 +139,7 @@
 
     var hint = document.createElement('p');
     hint.className = 'tapi-w-hint';
-    hint.textContent = 'Выделите любое слово — появится перевод. / Select any word to translate it.';
+    hint.textContent = 'Слова с точками внизу — сленг: наведите или нажмите, чтобы увидеть перевод. / Dotted words are slang: hover or tap for a translation.';
     pop.appendChild(hint);
 
     function open(v) {
