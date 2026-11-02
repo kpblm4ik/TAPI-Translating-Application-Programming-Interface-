@@ -1,12 +1,12 @@
 /*!
  * TAPI widget — кнопка «Т» в левом нижнем углу.
  * Кладётся в репозиторий TAPI рядом с tapi.js и подключается ОДНОЙ строкой:
- *   <script src=".../tapi-widget.js" defer></script>
+ *   <script src=".../tapi_widget.js" defer></script>
  * Сам подгружает tapi.js с выбранным языком (ru → literary_ru, en → translation_en).
  *
  * Необязательные атрибуты тега <script>:
  *   data-scope   — CSS-селектор области страницы (по умолчанию body)
- *   data-lookup  — wiktionary | off (по умолчанию off)
+ *   data-lookup  — wiktionary | off (по умолчанию wiktionary: любое выделенное слово)
  *   data-mode    — hover | replace | off (по умолчанию hover)
  */
 (function () {
@@ -38,6 +38,8 @@
     s.src = base + 'tapi.js';
     s.defer = true;
     s.setAttribute('data-lang', LANGS[code].tapi);
+    // по умолчанию любое выделенное слово ищется в Викисловаре (data-lookup="off" выключает)
+    s.setAttribute('data-lookup', 'wiktionary');
     ['scope', 'lookup', 'mode', 'src'].forEach(function (a) {
       var v = me.getAttribute('data-' + a);
       if (v) s.setAttribute('data-' + a, v);
@@ -64,7 +66,8 @@
     'border:1px solid var(--bd);border-radius:8px;background:transparent;color:inherit;font:inherit;cursor:pointer;text-align:left}' +
     '.tapi-w-opt:hover,.tapi-w-opt:focus-visible{background:var(--hv);outline:none}' +
     '.tapi-w-opt[aria-checked="true"]{border-color:var(--ac);box-shadow:inset 0 0 0 1px var(--ac)}' +
-    '.tapi-w-code{font-size:12px;opacity:.65}';
+    '.tapi-w-code{font-size:12px;opacity:.65}' +
+    '.tapi-w-hint{margin:8px 0 0;font-size:12px;opacity:.7}';
   var st = document.createElement('style');
   st.textContent = css;
   document.head.appendChild(st);
@@ -114,6 +117,11 @@
       o.addEventListener('click', function () { choose(code); });
       group.appendChild(o);
     });
+
+    var hint = document.createElement('p');
+    hint.className = 'tapi-w-hint';
+    hint.textContent = 'Выделите любое слово — появится перевод. / Select any word to translate it.';
+    pop.appendChild(hint);
 
     function open(v) {
       pop.hidden = !v;
