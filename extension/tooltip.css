@@ -1,0 +1,5 @@
+.tapi-tip {
+  position: absolute; z-index: 2147483647; max-width: 280px;
+  padding: 8px 10px; border-radius: 8px; font: 14px/1.4 system-ui, sans-serif;
+  background: #1e2327; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,.35);
+}

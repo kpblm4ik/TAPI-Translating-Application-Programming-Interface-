@@ -1,62 +1,19 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "TAPI dictionary v1",
+  "title": "TAPI dictionary",
   "type": "object",
-  "required": [
-    "version",
-    "dictionary"
-  ],
+  "required": ["version", "dictionary"],
   "properties": {
-    "version": {
-      "type": "integer",
-      "const": 1
-    },
-    "updated": {
-      "type": "string",
-      "format": "date"
-    },
+    "version": { "type": "integer" },
     "dictionary": {
       "type": "object",
       "additionalProperties": {
         "type": "object",
-        "required": [
-          "literary_ru",
-          "translation_en"
-        ],
+        "required": ["literary_ru", "translation_en"],
         "properties": {
-          "literary_ru": {
-            "type": "string",
-            "minLength": 1
-          },
-          "translation_en": {
-            "type": "string",
-            "minLength": 1
-          },
-          "category": {
-            "type": "string",
-            "enum": [
-              "gaming",
-              "roblox",
-              "slang",
-              "it",
-              "general"
-            ]
-          },
-          "aliases": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "example": {
-            "type": "string"
-          },
-          "exact": {
-            "type": "boolean",
-            "description": "true — не угадывать падежи (для коротких слов, которые легко спутать с другими)"
-          }
-        },
-        "additionalProperties": false
+          "literary_ru": { "type": "string" },
+          "translation_en": { "type": "string" }
+        }
       }
     }
   }

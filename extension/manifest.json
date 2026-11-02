@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "TAPI — переводчик сленга",
+  "version": "0.1.0",
+  "description": "Выдели слово на любой странице — TAPI покажет литературный перевод сленга и английский вариант.",
+  "permissions": [],
+  "host_permissions": ["https://*.github.io/*"],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    { "matches": ["<all_urls>"], "js": ["content.js"], "css": ["tooltip.css"] }
+  ]
+}

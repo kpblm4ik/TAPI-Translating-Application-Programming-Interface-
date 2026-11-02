@@ -1,96 +1,49 @@
 # 🚀 TAPI — Translating Application Programming Interface
 
-Открытый словарь для перевода интернет-сленга, игрового жаргона и неологизмов в литературную речь и на английский. Подключается к любому сайту **одной строкой**.
+**TAPI** — это открытое, легковесное API данных для перевода современного интернет-сленга, IT-жаргона и неологизмов в литературную речь и иностранные языки.
 
-## Подключение
+Проект создан для веб-разработчиков, чтобы избавить их от необходимости писать собственные парсеры, словари и содержать бэкенд-сервера для адаптации контента под разную аудиторию.
 
-Кнопка «Т» с выбором языка (рекомендуется):
+## 🧩 Браузерное расширение
 
-```html
-<script src="https://kpblm4ik.github.io/TAPI-Translating-Application-Programming-Interface-/tapi_widget.js" defer></script>
-```
+В папке [`extension/`](extension/) лежит расширение для Chrome / Edge (Manifest V3). Выдели слово на любой странице — появится подсказка с литературным значением и английским вариантом.
 
-Только подсказки к словам, без кнопки:
+Установка для теста: `chrome://extensions` → «Режим разработчика» → «Загрузить распакованное» → папка `extension/`.
 
-```html
-<script src="https://kpblm4ik.github.io/TAPI-Translating-Application-Programming-Interface-/tapi.js" defer></script>
-```
+Новые слова добавляются в `extension/dictionary.json` и `v1/all.json` (формат: `literary_ru`, `translation_en`).
 
-Скрипт находит на странице слова из словаря, подчёркивает их точками, а при наведении (на телефоне при нажатии) показывает перевод.
+## 🌐 Как подключить TAPI к любому сайту
 
-## Кнопка «Т» (tapi_widget.js)
+Вы можете делать прямые `GET`-запросы к готовым JSON-эндпоинтам TAPI, развернутым на GitHub Pages.
 
-Появляется в левом нижнем углу и предлагает выбрать язык: Русский или English. Выбор запоминается в браузере.
-
-| Атрибут | Значения | По умолчанию |
-|---------|----------|--------------|
-| `data-scope` | CSS-селектор области страницы | `body` |
-| `data-mode` | `hover` (подсказка), `replace` (заменить слово), `off` | `hover` |
-| `data-phrases` | адрес JSON с английскими фразами для перевода страницы целиком | нет |
-| `data-src` | свой адрес словаря | `v1/all.json` |
-
-### Перевод страницы целиком (tapi-pages.js)
-
-Если задан `data-phrases`, при выборе English страница переводится по таблице фраз, а потом поверх накладываются подсказки словаря. Формат таблицы описан в начале `tapi-pages.js`. Непереведённый текст остаётся как есть.
-
-## tapi.js: настройки и API
-
-| Атрибут | Значения | По умолчанию |
-|---------|----------|--------------|
-| `data-lang` | `literary_ru`, `translation_en` | `literary_ru` |
-| `data-mode` | `hover`, `replace`, `off` (только API) | `hover` |
-| `data-scope` | CSS-селектор области страницы | `body` |
-| `data-src` | свой адрес словаря | `v1/all.json` рядом со скриптом |
-
-Не нужно переводить фрагмент: `<div class="tapi-skip">…</div>` или `translate="no"`.
+### Пример на JavaScript:
 
 ```js
-await TAPI.ready;
-TAPI.translate('имба');                   // "чрезмерно сильный, ..."
-TAPI.translate('имба', 'translation_en'); // "overpowered (OP)"
-TAPI.lookup('Нерфнули');                  // вся запись словаря
-TAPI.refresh();                           // перепроверить страницу вручную
-```
+async function fetchSlangTranslation(word) {
+    const url = 'https://kpblm4ik.github.io/TAPI-Translating-Application-Programming-Interface-/v1/all.json';
+    try {
+        const response = await fetch(url);
+        const tapiData = await response.json();
 
-## Подключение через Jekyll (_config.yml)
-
-```yml
-tapi:
-  enabled: true
-  src: "https://kpblm4ik.github.io/TAPI-Translating-Application-Programming-Interface-/tapi_widget.js"
-  scope: ".wrapper"
-  phrases: "https://kpblm4ik.github.io/a51bfcts_wikipedia/tapi-en.json"
-```
-
-В шаблоне (`_includes/tapi.html`) стоит один `<script>`, который читает эти настройки, поэтому на каждую страницу ссылку писать не нужно.
-
-## Хостинг
-
-1. Репозиторий → **Settings → Pages** → Source: `main`, папка `/ (root)`.
-2. Через минуту адреса `…github.io/TAPI-Translating-Application-Programming-Interface-/tapi.js` заработают.
-3. Запасной вариант: `https://cdn.jsdelivr.net/gh/kpblm4ik/TAPI-Translating-Application-Programming-Interface-@main/tapi.js`.
-
-## Эндпоинты
-
-- `/v1/all.json` — словарь.
-- `/v1/schema.json` — JSON-схема для проверки.
-
-## Формат слова
-
-```json
-"имба": {
-  "literary_ru": "чрезмерно сильный ...",
-  "translation_en": "overpowered (OP)",
-  "category": "gaming",
-  "aliases": ["имбовый"],
-  "example": "Эта катушка просто имба"
+        const cleanWord = word.toLowerCase().trim();
+        if (tapiData.dictionary[cleanWord]) {
+            return tapiData.dictionary[cleanWord];
+        }
+        return null; // Слово не найдено в TAPI
+    } catch (error) {
+        console.error('TAPI Error:', error);
+    }
 }
+
+// Использование:
+fetchSlangTranslation('имба').then(data => {
+    if (data) console.log(`Литературно: ${data.literary_ru} | EN: ${data.translation_en}`);
+});
 ```
 
-- `category`: `gaming`, `roblox`, `slang`, `it`, `general`.
-- `aliases`: другие формы слова и фразы. Падежи существительных скрипт угадывает сам, а для глаголов на -ить/-ать/-ять сам строит личные формы и прошедшее время (шарить → шарю, шарит, шарил). Остальные формы и фразы из нескольких слов добавляйте в `aliases`.
-- `exact: true`: не угадывать окончания. Нужно для коротких слов, которые легко спутать с другими (ник ≠ Ника, чит ≠ Чита).
+## 📊 Доступные эндпоинты
 
-## Как добавить слово
+- `https://kpblm4ik.github.io/TAPI-Translating-Application-Programming-Interface-/v1/all.json` — полная база данных словаря.
+- `https://kpblm4ik.github.io/TAPI-Translating-Application-Programming-Interface-/v1/schema.json` — JSON-схема для валидации.
 
-Допишите запись в `v1/all.json` и проверьте файл по `schema.json`. Хорошая запись: объясняет смысл одной фразой, не повторяет само слово и указывает категорию. Слова с несколькими значениями лучше описывать по контексту («в играх: …»).
+> Эндпоинты заработают после включения GitHub Pages (Settings → Pages → Deploy from branch → `main` / root).
