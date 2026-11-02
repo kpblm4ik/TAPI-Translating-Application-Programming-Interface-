@@ -4,19 +4,19 @@
 
 Проект создан для веб-разработчиков, чтобы избавить их от необходимости писать собственные парсеры, словари и содержать бэкенд-сервера для адаптации контента под разную аудиторию.
 
-## 🧩 Браузерное расширение
+TAPI существует в трёх версиях, и все они используют один и тот же словарь (формат: `literary_ru`, `translation_en`).
 
-В папке [`extension/`](extension/) лежит расширение для Chrome / Edge (Manifest V3). Выдели слово на любой странице — появится подсказка с литературным значением и английским вариантом.
+## 1. 🔗 Подключение по ссылке (для сайтов)
 
-Установка для теста: `chrome://extensions` → «Режим разработчика» → «Загрузить распакованное» → папка `extension/`.
+Одна строка на любой странице подчеркнёт слова из словаря и покажет перевод при наведении:
 
-Новые слова добавляются в `extension/dictionary.json` и `v1/all.json` (формат: `literary_ru`, `translation_en`).
+```html
+<script src="https://kpblm4ik.github.io/TAPI-Translating-Application-Programming-Interface-/v1/tapi.js" defer></script>
+```
 
-## 🌐 Как подключить TAPI к любому сайту
+Демо: `index.html` в корне репозитория.
 
-Вы можете делать прямые `GET`-запросы к готовым JSON-эндпоинтам TAPI, развернутым на GitHub Pages.
-
-### Пример на JavaScript:
+### Или напрямую через JSON (JavaScript)
 
 ```js
 async function fetchSlangTranslation(word) {
@@ -41,9 +41,26 @@ fetchSlangTranslation('имба').then(data => {
 });
 ```
 
-## 📊 Доступные эндпоинты
+### Эндпоинты
 
 - `https://kpblm4ik.github.io/TAPI-Translating-Application-Programming-Interface-/v1/all.json` — полная база данных словаря.
 - `https://kpblm4ik.github.io/TAPI-Translating-Application-Programming-Interface-/v1/schema.json` — JSON-схема для валидации.
+- `https://kpblm4ik.github.io/TAPI-Translating-Application-Programming-Interface-/v1/tapi.js` — скрипт для встраивания.
 
-> Эндпоинты заработают после включения GitHub Pages (Settings → Pages → Deploy from branch → `main` / root).
+> Работает после включения GitHub Pages: Settings → Pages → Deploy from branch → `main` / root.
+
+## 2. 🧩 Расширение для браузера
+
+Папка [`extension/`](extension/) — расширение для Chrome / Edge / Brave (Manifest V3). Выдели слово на странице — появится подсказка.
+
+Установка: `chrome://extensions` → «Режим разработчика» → «Загрузить распакованное» → папка `extension/`.
+
+## 3. 📱 Android-приложение (APK)
+
+Папка [`android/`](android/) — приложение на Kotlin. Выдели текст в любом приложении и выбери «TAPI перевод» в меню; либо введи слово на главном экране.
+
+APK собирается автоматически: вкладка **Actions** → последний запуск «Build APK» → артефакт **tapi-apk**. Разреши установку из неизвестных источников и открой `app-debug.apk`.
+
+## ➕ Как добавить слова
+
+Добавляй записи в `v1/all.json`, `extension/dictionary.json` и `android/app/src/main/assets/dictionary.json` (одинаковый формат).

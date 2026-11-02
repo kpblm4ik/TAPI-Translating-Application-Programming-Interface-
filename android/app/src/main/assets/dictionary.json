@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "dictionary": {
+    "имба":   { "literary_ru": "очень сильный, превосходящий остальных", "translation_en": "overpowered" },
+    "кринж":  { "literary_ru": "испанский стыд, неловкость за чужие действия", "translation_en": "cringe" },
+    "рофл":   { "literary_ru": "шутка, смех до упаду", "translation_en": "lol / a joke" },
+    "краш":   { "literary_ru": "объект симпатии", "translation_en": "crush" },
+    "вайб":   { "literary_ru": "атмосфера, настроение", "translation_en": "vibe" },
+    "хайп":   { "literary_ru": "шумиха, ажиотаж", "translation_en": "hype" },
+    "флексить": { "literary_ru": "хвастаться, красоваться", "translation_en": "to flex" },
+    "зашквар": { "literary_ru": "позор, поступок, портящий репутацию", "translation_en": "a disgrace" },
+    "душнила": { "literary_ru": "занудный человек", "translation_en": "a bore / stickler" },
+    "crunk":  { "literary_ru": "заводной, энергичный (стиль южного хип-хопа)", "translation_en": "high-energy, hyped" },
+    "trill":  { "literary_ru": "настоящий, без фальши (true + real)", "translation_en": "genuine, authentic" },
+    "grill":  { "literary_ru": "украшения на зубах", "translation_en": "decorative teeth jewelry" },
+    "drip":   { "literary_ru": "стильный образ, дорогая одежда", "translation_en": "stylish outfit/swagger" },
+    "no cap": { "literary_ru": "без вранья, честно", "translation_en": "no lie" },
+    "lit":    { "literary_ru": "огонь, очень круто", "translation_en": "exciting, great" }
+  }
+}
