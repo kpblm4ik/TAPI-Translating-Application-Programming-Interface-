@@ -1,19 +1,28 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "TAPI dictionary",
+  "title": "TAPI dictionary v1",
   "type": "object",
   "required": ["version", "dictionary"],
   "properties": {
-    "version": { "type": "integer" },
+    "version": { "type": "integer", "const": 1 },
+    "updated": { "type": "string", "format": "date" },
     "dictionary": {
       "type": "object",
       "additionalProperties": {
         "type": "object",
         "required": ["literary_ru", "translation_en"],
         "properties": {
-          "literary_ru": { "type": "string" },
-          "translation_en": { "type": "string" }
-        }
+          "literary_ru": { "type": "string", "minLength": 1, "description": "Русский текст: для английского слова — перевод и пояснение, для русского — объяснение литературным языком" },
+          "translation_en": { "type": "string", "minLength": 1, "description": "Английский текст: для русского слова — перевод и пояснение, для английского — определение" },
+          "short": { "type": "string", "description": "Короткий перевод на ДРУГОЙ язык: для lang=ru это английский, для lang=en — русский. Подходит для замены слова в тексте" },
+          "lang": { "type": "string", "enum": ["ru", "en"], "description": "Язык самого слова (ключа)" },
+          "plain": { "type": "string", "description": "Очень краткое простое объяснение на языке слова" },
+          "category": { "type": "string", "enum": ["gaming", "roblox", "slang", "reddit", "music", "it", "general"] },
+          "aliases": { "type": "array", "items": { "type": "string" } },
+          "example": { "type": "string" },
+          "exact": { "type": "boolean", "description": "true — не угадывать падежи (для коротких слов, которые легко спутать с другими)" }
+        },
+        "additionalProperties": false
       }
     }
   }
